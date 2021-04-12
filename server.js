@@ -15,23 +15,28 @@ const io = socketio(server);
 app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", (socket) => {
-  socket.emit("message", formatMessage("Gupshup Bot", "Welcome To GupShup!"));
-  //Broadcast when a user connects
-  socket.broadcast.emit(
-    "message",
-    formatMessage("Gupshup Bot", "A user has joined the chat")
-  );
-  //Broadcast when user disconnects
-  socket.on("disconnect", () => {
-    io.emit(
+  socket.on("joinRoom", ({ username, room }) => {
+
+    //Welcome current user
+    socket.emit("message", formatMessage("Gupshup Bot", "Welcome To GupShup!"));
+    //Broadcast when a user connects
+    socket.broadcast.emit(
       "message",
-      formatMessage("Gupshup Bot", "A user has left the chat")
+      formatMessage("Gupshup Bot", "A user has joined the chat")
     );
   });
 
   //Listen for chat message
   socket.on("chatMessage", (msg) => {
     io.emit("message", formatMessage("USER", msg));
+  });
+
+  //Broadcast when user disconnects
+  socket.on("disconnect", () => {
+    io.emit(
+      "message",
+      formatMessage("Gupshup Bot", "A user has left the chat")
+    );
   });
 });
 

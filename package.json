@@ -1,0 +1,28 @@
+{
+  "name": "gupshup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Manthan109/Gupshup.git"
+  },
+  "author": "Manthan Gupta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Manthan109/Gupshup/issues"
+  },
+  "homepage": "https://github.com/Manthan109/Gupshup#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "socket.io": "^4.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

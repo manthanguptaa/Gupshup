@@ -3,8 +3,12 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
-const { format } = require("path");
-
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+} = require("./utils/users");
 const app = express();
 
 const server = http.createServer(app);
@@ -16,27 +20,34 @@ app.use(express.static(path.join(__dirname, "public")));
 
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }) => {
-
+    const user = userJoin(socket.id, username, room);
+    socket.join(user.room);
     //Welcome current user
     socket.emit("message", formatMessage("Gupshup Bot", "Welcome To GupShup!"));
     //Broadcast when a user connects
-    socket.broadcast.emit(
-      "message",
-      formatMessage("Gupshup Bot", "A user has joined the chat")
-    );
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        "message",
+        formatMessage("Gupshup Bot", `${user.username} has joined the chat`)
+      );
   });
 
   //Listen for chat message
   socket.on("chatMessage", (msg) => {
-    io.emit("message", formatMessage("USER", msg));
+    const user = getCurrentUser(socket.id);
+    io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
 
   //Broadcast when user disconnects
   socket.on("disconnect", () => {
-    io.emit(
-      "message",
-      formatMessage("Gupshup Bot", "A user has left the chat")
-    );
+    const user = userLeave(socket.id);
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        formatMessage("Gupshup Bot", `${user.username} has left the chat`)
+      );
+    }
   });
 });
 
